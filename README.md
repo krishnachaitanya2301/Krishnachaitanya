@@ -27,5 +27,15 @@
 ├── redis
 └── readme.md
 
+##### Create a new directory by using following commmand 
+   mkdir app && cd app
 
- 
+##### Inside of our app parent directory, we're going to create a couple more directorires, one for each container - flask and nginx:
+
+mkdir flask nginx 
+
+##### Now create docker-compose.yml file in the app directory. We will use this file to define our application services
+
+touch docker-compose.yml
+
+##### 
