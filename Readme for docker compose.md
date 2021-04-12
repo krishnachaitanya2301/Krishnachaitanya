@@ -76,7 +76,8 @@
 ##### Now run the app :
     flask run
 ##### Hit URL in your browser and you will see
-Hello From Flask
+
+    "Hello From Flask"
 ##### Now go in flask directory and create docker file:
     touch Dockerfile
 ##### Add the following
@@ -126,7 +127,7 @@ Hello From Flask
 
          # Replace with nginx.conf
     COPY nginx.conf /etc/nginx/conf.d/
-##### Open up docker-compose.yml file and add the following:
+##### Open up docker-compose.yaml file and add the following:
      version: "3.7"
 
      services:
@@ -157,7 +158,8 @@ Hello From Flask
 ##### Now run the following to create and start the container:
     docker-compose up
 ##### Now open http://localhost/ to see your flask app in action you can see:
-Hello from MyFlaskApp running in a Docker container behind Nginx!
+
+    "Hello from MyFlaskApp running in a Docker container behind Nginx!"
     
 
 
