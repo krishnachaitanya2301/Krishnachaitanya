@@ -22,12 +22,10 @@
     python -m venv env
 ##### Activate it:
     source env/bin/activate
-##### to install redis, Consul, Docker engine and docker compose :
-  Go to official sites respectively and use respective commands to install it
-##### to install flask and uwsgi use following command:
-    pip install flask uwsgi
-##### Once the packages are installed we will generate requirements.txt:
-    pip freeze  > requirements.txt
+##### create requiremwnts.txt
+    flask
+    uwsgi
+    redis
 ##### Now we can build our app. Create a file called run.py:
     touch run.py
 ##### Open up run.py and add the following:
@@ -50,8 +48,10 @@
     mkdir app && cd app
 ##### Create app.py. Open it and add the following:
     from flask import Flask
+    import redis
 
     app = Flask(__name__)
+    cache=redis.redis(host='redis',port=6379
 
     from app import views
 ##### Now create views.py file and add the following:
@@ -127,6 +127,59 @@
 
          # Replace with nginx.conf
     COPY nginx.conf /etc/nginx/conf.d/
+#### create a new directory called consul
+     cd consul
+#### now create new file consul-config.json
+     touch consul-config
+#### Open this file and add the following
+     {
+     "datacenter": "localhost",
+     "data_dir": "/consul/data",
+     "log_level": "info",
+     "server": true,
+     "addresses": {
+      "https": "0.0.0.0"
+      "ports": {
+      "https": 8501
+       }
+         }
+ #### Go to consul directory and create docker file:
+      touch Dockerfile
+ #### Open this file and add the following:
+       # base image
+  FROM alpine:3.7
+
+    # set consul version
+     ENV CONSUL_VERSION 1.2.1
+
+     # create a new directory
+      RUN mkdir /consul
+
+     # download dependencies
+       RUN apk --no-cache add \
+        bash \
+        ca-certificates \
+         wget
+
+    # download and set up consul
+     RUN wget --quiet --output-document=/tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    unzip /tmp/consul.zip -d /consul && \
+    rm -f /tmp/consul.zip && \
+    chmod +x /consul/consul
+
+    # update PATH
+  ENV PATH="PATH=$PATH:$PWD/consul"
+
+    # add the config file
+  COPY ./config/consul-config.json /consul/config/config.json
+
+     # expose ports
+  EXPOSE 8500
+
+    # run consul
+  ENTRYPOINT ["consul"]
+ 
+     
 ##### Open up docker-compose.yaml file and add the following:
      version: "3.7"
 
@@ -149,9 +202,15 @@
         restart: always
         ports:
           - "80:80"
+      consul:
+        build: ./consul
+        container_name: consul
+        dockerfile: Dockerfile
+        ports:
+      - 8500:8500
 
       redis:
-      image: redis
+      image: "redis:alpine"
 
 ##### To build the services run the following command:
     docker-compose build
